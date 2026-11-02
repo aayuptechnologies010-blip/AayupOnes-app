@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../auth/login_screen.dart';
-import '../admin/admin_panel_screen.dart';
 import '../documents/employee_documents_screen.dart';
 import '../leave/leave_screen.dart';
 import '../attendance/attendance_screen.dart';
@@ -703,7 +702,7 @@ class _MoreScreenState extends State<MoreScreen> {
 
                     const SizedBox(height: 14),
 
-                    // Row 2: Attendance & (Blank or Admin panel access)
+                    // Row 2: Attendance (Full Width / Half Width matching image)
                     Row(
                       children: [
                         Expanded(
@@ -716,14 +715,8 @@ class _MoreScreenState extends State<MoreScreen> {
                           ),
                         ),
                         const SizedBox(width: 14),
-                        Expanded(
-                          child: _buildGridTile(
-                            icon: Icons.admin_panel_settings_outlined,
-                            iconBg: const Color(0xFFFFF7ED),
-                            iconColor: const Color(0xFFF97316),
-                            title: 'Admin Console',
-                            onTap: () => _navigateTo(context, const AdminPanelScreen()),
-                          ),
+                        const Expanded(
+                          child: SizedBox.shrink(),
                         ),
                       ],
                     ),
