@@ -17,7 +17,7 @@ class MoreScreen extends StatefulWidget {
 
 class _MoreScreenState extends State<MoreScreen> {
   bool _isOnDuty = true;
-  String _dutyDuration = "09:27:10";
+  final String _dutyDuration = "09:27:10";
 
   void _navigateTo(BuildContext context, Widget screen) {
     Navigator.push(
@@ -31,7 +31,7 @@ class _MoreScreenState extends State<MoreScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Confirm Logout', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('Confirm Logout', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.textPrimary)),
         content: const Text(
           'Are you sure you want to end your current session and sign out from AayupOnes?',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
@@ -43,7 +43,7 @@ class _MoreScreenState extends State<MoreScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: AppColors.danger,
               foregroundColor: Colors.white,
             ),
             onPressed: () {
@@ -89,16 +89,16 @@ class _MoreScreenState extends State<MoreScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE8F1FD),
+                    color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.business_rounded, color: Color(0xFF0066D6), size: 28),
+                  child: const Icon(Icons.business_rounded, color: AppColors.primary, size: 28),
                 ),
                 const SizedBox(width: 14),
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('About Aayup Technologies', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+                    Text('About Aayup Technologies', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.textPrimary)),
                     Text('Empowering Enterprise Workflows', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                   ],
                 ),
@@ -115,7 +115,7 @@ class _MoreScreenState extends State<MoreScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.border),
               ),
@@ -125,7 +125,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Platform Version:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      Text('v2.4.0-Enterprise', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('v2.4.0-Enterprise', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
                   SizedBox(height: 6),
@@ -133,7 +133,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Headquarters:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      Text('Bengaluru & Noida, India', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('Bengaluru & Noida, India', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
                   SizedBox(height: 6),
@@ -141,7 +141,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Support Contact:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      Text('support@aayuptechnologies.com', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF0066D6))),
+                      Text('support@aayuptechnologies.com', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primary)),
                     ],
                   ),
                 ],
@@ -153,7 +153,7 @@ class _MoreScreenState extends State<MoreScreen> {
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0A4F3D),
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () => Navigator.pop(ctx),
@@ -194,16 +194,16 @@ class _MoreScreenState extends State<MoreScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: AppColors.warningLight,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.gavel_rounded, color: Color(0xFFD97706), size: 28),
+                  child: const Icon(Icons.gavel_rounded, color: AppColors.warning, size: 28),
                 ),
                 const SizedBox(width: 14),
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Terms of Use & Workplace Policy', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    Text('Terms of Use & Workplace Policy', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.textPrimary)),
                     Text('Employee Code of Conduct', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
                   ],
                 ),
@@ -216,21 +216,21 @@ class _MoreScreenState extends State<MoreScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('1. Confidentiality & IP', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    Text('1. Confidentiality & IP', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
                     SizedBox(height: 4),
                     Text(
                       'All source code, designs, credentials, customer records, and operational assets accessed via AayupOnes are proprietary to Aayup Technologies. Unauthorized distribution or copying is strictly prohibited under our Non-Disclosure Agreement.',
                       style: TextStyle(fontSize: 12, height: 1.4, color: AppColors.textSecondary),
                     ),
                     SizedBox(height: 12),
-                    Text('2. Shift Punching & Geofence Policy', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    Text('2. Shift Punching & Geofence Policy', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
                     SizedBox(height: 4),
                     Text(
                       'Employees are required to punch in and out using authentic device biometric verification. Proxy check-ins or manipulating GPS locations violates enterprise attendance standards.',
                       style: TextStyle(fontSize: 12, height: 1.4, color: AppColors.textSecondary),
                     ),
                     SizedBox(height: 12),
-                    Text('3. Document Verification Integrity', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    Text('3. Document Verification Integrity', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
                     SizedBox(height: 4),
                     Text(
                       'All government identity and educational credentials submitted during onboarding must be genuine and verifiable. Discrepancies may result in credential re-submission or administrative review.',
@@ -246,7 +246,7 @@ class _MoreScreenState extends State<MoreScreen> {
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0A4F3D),
+                  backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () => Navigator.pop(ctx),
@@ -270,9 +270,9 @@ class _MoreScreenState extends State<MoreScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
-              Icon(Icons.rate_review_outlined, color: Color(0xFF0A4F3D)),
+              Icon(Icons.rate_review_outlined, color: AppColors.primary),
               SizedBox(width: 8),
-              Text('Share Feedback', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+              Text('Share Feedback', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.textPrimary)),
             ],
           ),
           content: SingleChildScrollView(
@@ -285,7 +285,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 16),
-                const Text('Overall Experience', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                const Text('Overall Experience', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary)),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -321,7 +321,7 @@ class _MoreScreenState extends State<MoreScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0A4F3D),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -344,18 +344,18 @@ class _MoreScreenState extends State<MoreScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FA),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Header matching reference screenshot (Dark Forest Green)
+              // Standard AayupOnes Brand Gradient Header (Matching App Theme)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF0A4F3D), // Deep Green from user screenshot
+                  gradient: AppColors.primaryGradient,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -377,26 +377,26 @@ class _MoreScreenState extends State<MoreScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFFD1FAE5),
+                            color: Color(0xFFE0EDFF),
                           ),
                         ),
                       ],
                     ),
-                    // Logout button matching user reference pill
+                    // Logout button in white pill style
                     InkWell(
                       onTap: () => _showLogoutDialog(context),
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E3A2F).withOpacity(0.8),
+                          color: Colors.white.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          border: Border.all(color: Colors.white.withOpacity(0.35)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.door_front_door_outlined, size: 16, color: Color(0xFFFCA5A5)),
+                            Icon(Icons.door_front_door_outlined, size: 16, color: Colors.white),
                             SizedBox(width: 6),
                             Text(
                               'Logout',
@@ -424,9 +424,10 @@ class _MoreScreenState extends State<MoreScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.border),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withOpacity(0.02),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -443,10 +444,10 @@ class _MoreScreenState extends State<MoreScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFEFF6FF),
+                                        color: AppColors.primaryLight,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: const Icon(Icons.calendar_month_rounded, size: 20, color: Color(0xFF2563EB)),
+                                      child: const Icon(Icons.calendar_month_rounded, size: 20, color: AppColors.primary),
                                     ),
                                     const SizedBox(width: 10),
                                     const Column(
@@ -454,7 +455,7 @@ class _MoreScreenState extends State<MoreScreen> {
                                       children: [
                                         Text('Joining Date', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                                         SizedBox(height: 2),
-                                        Text('02/11/2026', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                                        Text('02/11/2026', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.textPrimary)),
                                       ],
                                     ),
                                   ],
@@ -467,10 +468,10 @@ class _MoreScreenState extends State<MoreScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFEF3C7),
+                                        color: AppColors.warningLight,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: const Icon(Icons.badge_rounded, size: 20, color: Color(0xFFD97706)),
+                                      child: const Icon(Icons.badge_rounded, size: 20, color: AppColors.warning),
                                     ),
                                     const SizedBox(width: 10),
                                     const Column(
@@ -480,7 +481,7 @@ class _MoreScreenState extends State<MoreScreen> {
                                         SizedBox(height: 2),
                                         Text(
                                           'AAYUP-EMP-2026-37583',
-                                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: Color(0xFF0F766E)),
+                                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.primary),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
@@ -491,7 +492,7 @@ class _MoreScreenState extends State<MoreScreen> {
                             ],
                           ),
                           const SizedBox(height: 14),
-                          const Divider(height: 1),
+                          const Divider(height: 1, color: AppColors.borderLight),
                           const SizedBox(height: 12),
                           // Account Status row
                           Row(
@@ -499,7 +500,7 @@ class _MoreScreenState extends State<MoreScreen> {
                             children: [
                               const Row(
                                 children: [
-                                  Icon(Icons.circle, size: 9, color: Color(0xFF10B981)),
+                                  Icon(Icons.circle, size: 9, color: AppColors.success),
                                   SizedBox(width: 8),
                                   Text(
                                     'Account Status:',
@@ -510,15 +511,16 @@ class _MoreScreenState extends State<MoreScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981),
+                                  color: AppColors.successLight,
                                   borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFA7F3D0)),
                                 ),
                                 child: const Text(
                                   'ACTIVE',
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,
-                                    color: Colors.white,
+                                    color: Color(0xFF065F46),
                                     letterSpacing: 0.5,
                                   ),
                                 ),
@@ -537,9 +539,10 @@ class _MoreScreenState extends State<MoreScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.border),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withOpacity(0.02),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -556,7 +559,7 @@ class _MoreScreenState extends State<MoreScreen> {
                                   SizedBox(width: 6),
                                   Text(
                                     'OFFICIAL SHIFT',
-                                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.3),
+                                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 0.3, color: AppColors.textPrimary),
                                   ),
                                   SizedBox(width: 4),
                                   Text(
@@ -568,7 +571,7 @@ class _MoreScreenState extends State<MoreScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: _isOnDuty ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
+                                  color: _isOnDuty ? AppColors.successLight : AppColors.dangerLight,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(color: _isOnDuty ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA)),
                                 ),
@@ -578,7 +581,7 @@ class _MoreScreenState extends State<MoreScreen> {
                                     Icon(
                                       Icons.circle,
                                       size: 7,
-                                      color: _isOnDuty ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                                      color: _isOnDuty ? AppColors.success : AppColors.danger,
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
@@ -598,7 +601,7 @@ class _MoreScreenState extends State<MoreScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF8FAFC),
+                              color: AppColors.background,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(color: AppColors.border),
                             ),
@@ -610,14 +613,14 @@ class _MoreScreenState extends State<MoreScreen> {
                                   children: [
                                     Text(
                                       '24/7 OPERATIONAL DUTY',
-                                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: AppColors.textPrimary),
                                     ),
                                     SizedBox(height: 2),
                                     Row(
                                       children: [
-                                        Icon(Icons.circle, size: 7, color: Color(0xFF10B981)),
+                                        Icon(Icons.circle, size: 7, color: AppColors.success),
                                         SizedBox(width: 4),
-                                        Text('ACTIVE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: Color(0xFF10B981))),
+                                        Text('ACTIVE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: AppColors.success)),
                                         SizedBox(width: 6),
                                         Text('Shift: 24/7', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                                       ],
@@ -648,7 +651,7 @@ class _MoreScreenState extends State<MoreScreen> {
                                           width: 9,
                                           height: 9,
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFEF4444),
+                                            color: AppColors.danger,
                                             borderRadius: BorderRadius.circular(2),
                                           ),
                                         ),
@@ -674,15 +677,15 @@ class _MoreScreenState extends State<MoreScreen> {
 
                     const SizedBox(height: 20),
 
-                    // Grid of 7 Feature Tiles matching reference image exactly
+                    // Grid of Action Tiles matching app standard theme
                     // Row 1: Documents & Leaves
                     Row(
                       children: [
                         Expanded(
                           child: _buildGridTile(
                             icon: Icons.description_outlined,
-                            iconBg: const Color(0xFFEFF6FF),
-                            iconColor: const Color(0xFF3B82F6),
+                            iconBg: AppColors.primaryLight,
+                            iconColor: AppColors.primary,
                             title: 'Documents',
                             onTap: () => _navigateTo(context, const EmployeeDocumentsScreen()),
                           ),
@@ -691,8 +694,8 @@ class _MoreScreenState extends State<MoreScreen> {
                         Expanded(
                           child: _buildGridTile(
                             icon: Icons.beach_access_outlined,
-                            iconBg: const Color(0xFFECFDF5),
-                            iconColor: const Color(0xFF10B981),
+                            iconBg: AppColors.successLight,
+                            iconColor: AppColors.success,
                             title: 'Leaves',
                             onTap: () => _navigateTo(context, const LeaveScreen()),
                           ),
@@ -702,7 +705,7 @@ class _MoreScreenState extends State<MoreScreen> {
 
                     const SizedBox(height: 14),
 
-                    // Row 2: Attendance (Full Width / Half Width matching image)
+                    // Row 2: Attendance
                     Row(
                       children: [
                         Expanded(
@@ -729,8 +732,8 @@ class _MoreScreenState extends State<MoreScreen> {
                         Expanded(
                           child: _buildGridTile(
                             icon: Icons.headset_mic_outlined,
-                            iconBg: const Color(0xFFFEF9C3),
-                            iconColor: const Color(0xFFCA8A04),
+                            iconBg: AppColors.warningLight,
+                            iconColor: AppColors.warning,
                             title: 'Help & Support',
                             onTap: () => _navigateTo(context, const HelpdeskScreen()),
                           ),
@@ -756,8 +759,8 @@ class _MoreScreenState extends State<MoreScreen> {
                         Expanded(
                           child: _buildGridTile(
                             icon: Icons.assignment_outlined,
-                            iconBg: const Color(0xFFF1F5F9),
-                            iconColor: const Color(0xFF475569),
+                            iconBg: AppColors.borderLight,
+                            iconColor: AppColors.textSecondary,
                             title: 'Terms of Use',
                             onTap: () => _showTermsDialog(context),
                           ),
@@ -804,12 +807,12 @@ class _MoreScreenState extends State<MoreScreen> {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(0.02),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

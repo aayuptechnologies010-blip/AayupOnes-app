@@ -6,7 +6,6 @@ import '../work/work_screen.dart';
 import '../leave/leave_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../holidays/holiday_list_screen.dart';
-import '../admin/admin_panel_screen.dart';
 import 'manager_hub_screen.dart';
 
 class HomeScreen extends StatefulWidget {

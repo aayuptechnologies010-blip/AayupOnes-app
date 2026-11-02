@@ -6,7 +6,7 @@ class EmployeeDocumentsScreen extends StatefulWidget {
 
   const EmployeeDocumentsScreen({
     super.key,
-    this.isFresher = true, // default to Fresher or Experienced
+    this.isFresher = true,
   });
 
   @override
@@ -51,7 +51,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
         ),
         child: Column(
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 12, bottom: 8),
               width: 48,
@@ -61,7 +60,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
@@ -72,7 +70,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.textPrimary),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -90,8 +88,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               ),
             ),
             const Divider(height: 1),
-
-            // Notice Banner (Security / Download policy)
             if (!allowDownload)
               Container(
                 width: double.infinity,
@@ -114,27 +110,25 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                color: const Color(0xFFECFDF5),
+                color: AppColors.primaryLight,
                 child: const Row(
                   children: [
-                    Icon(Icons.verified_outlined, size: 18, color: Color(0xFF059669)),
+                    Icon(Icons.verified_outlined, size: 18, color: AppColors.primary),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Official Issued Document: You are authorized to download, store, or share this document.',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF065F46)),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDark),
                       ),
                     ),
                   ],
                 ),
               ),
-
-            // Document Mock Preview Canvas
             Expanded(
               child: Container(
                 margin: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -161,13 +155,13 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                           child: Icon(
                             allowDownload ? Icons.file_download_done_rounded : Icons.lock_outline_rounded,
                             size: 40,
-                            color: allowDownload ? const Color(0xFF0066D6) : const Color(0xFF0F766E),
+                            color: AppColors.primary,
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           fileName,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 6),
@@ -213,8 +207,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 ),
               ),
             ),
-
-            // Footer Action
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: allowDownload
@@ -228,7 +220,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0F766E),
+                          backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         onPressed: () {
@@ -309,24 +301,28 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFF0A4F3D), // matching dark green header theme
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Document Vault', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.white)),
-            Text('Official Identity & Corporate Records', style: TextStyle(fontSize: 11, color: Color(0xFFD1FAE5))),
+            Text('Document Vault', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.textPrimary)),
+            Text('Official Identity & Corporate Records', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
           ],
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: AppColors.primary,
           indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: const Color(0xFFD1FAE5),
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondary,
           labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           tabs: const [
             Tab(text: 'My Documents'),
@@ -344,9 +340,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
     );
   }
 
-  // TAB 1: My Documents (Uploaded during Onboarding - View Only, No Download)
   Widget _buildMyDocumentsTab() {
-    // Dynamic list based on Fresher vs Experienced
     final List<Map<String, dynamic>> fresherDocs = [
       {
         'title': 'Aadhaar Card (Front & Back)',
@@ -456,7 +450,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Onboarding Type Selector Toggle (Fresher / Experienced)
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -472,7 +465,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                     children: [
                       const Text(
                         'Onboarding Profile Mode',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary),
                       ),
                       Text(
                         _isFresher ? 'Showing Fresher Document Checklist' : 'Showing Experienced Document Checklist',
@@ -483,7 +476,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: AppColors.borderLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -492,9 +485,9 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                         onTap: () => setState(() => _isFresher = true),
                         borderRadius: BorderRadius.circular(10),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: _isFresher ? const Color(0xFF0F766E) : Colors.transparent,
+                            color: _isFresher ? AppColors.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -511,9 +504,9 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                         onTap: () => setState(() => _isFresher = false),
                         borderRadius: BorderRadius.circular(10),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: !_isFresher ? const Color(0xFF0F766E) : Colors.transparent,
+                            color: !_isFresher ? AppColors.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -532,20 +525,17 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               ],
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Security Rule Card
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF6FF),
+              color: AppColors.infoLight,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFBFDBFE)),
             ),
             child: const Row(
               children: [
-                Icon(Icons.info_outline_rounded, color: Color(0xFF2563EB), size: 20),
+                Icon(Icons.info_outline_rounded, color: AppColors.info, size: 20),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -556,10 +546,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // Documents List
           ...activeDocs.map((doc) => _buildDocTile(
                 title: doc['title'],
                 category: doc['category'],
@@ -574,7 +561,6 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
     );
   }
 
-  // TAB 2: Company Documents (Issued by Company - Download Allowed)
   Widget _buildCompanyDocumentsTab() {
     final List<Map<String, dynamic>> companyDocs = [
       {
@@ -632,17 +618,16 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
+              color: AppColors.successLight,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: const Color(0xFFA7F3D0)),
             ),
             child: const Row(
               children: [
-                Icon(Icons.download_for_offline_outlined, color: Color(0xFF059669), size: 20),
+                Icon(Icons.download_for_offline_outlined, color: AppColors.success, size: 20),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -653,9 +638,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
           ...companyDocs.map((doc) => _buildDocTile(
                 title: doc['title'],
                 category: doc['category'],
@@ -712,12 +695,12 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: allowDownload ? const Color(0xFFE8F1FD) : const Color(0xFFF0FDF4),
+                  color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   icon,
-                  color: allowDownload ? const Color(0xFF0066D6) : const Color(0xFF0A4F3D),
+                  color: AppColors.primary,
                   size: 22,
                 ),
               ),
@@ -762,7 +745,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
               const SizedBox(width: 8),
               if (allowDownload)
                 IconButton(
-                  icon: const Icon(Icons.download_rounded, color: Color(0xFF0F766E), size: 22),
+                  icon: const Icon(Icons.download_rounded, color: AppColors.primary, size: 22),
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -776,7 +759,7 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: AppColors.borderLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Row(
@@ -794,4 +777,3 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
     );
   }
 }
-
