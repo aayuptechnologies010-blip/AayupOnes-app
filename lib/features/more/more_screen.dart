@@ -4,6 +4,7 @@ import '../auth/login_screen.dart';
 import '../documents/employee_documents_screen.dart';
 import '../leave/leave_screen.dart';
 import '../attendance/attendance_screen.dart';
+import '../holidays/holiday_list_screen.dart';
 import 'helpdesk_screen.dart';
 
 class MoreScreen extends StatefulWidget {
@@ -705,7 +706,7 @@ class _MoreScreenState extends State<MoreScreen> {
 
                     const SizedBox(height: 14),
 
-                    // Row 2: Attendance
+                    // Row 2: Attendance & Holidays (Balanced Grid)
                     Row(
                       children: [
                         Expanded(
@@ -718,8 +719,14 @@ class _MoreScreenState extends State<MoreScreen> {
                           ),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
-                          child: SizedBox.shrink(),
+                        Expanded(
+                          child: _buildGridTile(
+                            icon: Icons.celebration_outlined,
+                            iconBg: const Color(0xFFFFF7ED),
+                            iconColor: const Color(0xFFF97316),
+                            title: 'Holidays',
+                            onTap: () => _navigateTo(context, const HolidayListScreen()),
+                          ),
                         ),
                       ],
                     ),
