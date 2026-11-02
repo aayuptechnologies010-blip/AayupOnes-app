@@ -346,72 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 12),
 
-              // AayupOnes HR Admin Console Banner
-              InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AdminPanelScreen()),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.12),
-                        blurRadius: 14,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(Icons.admin_panel_settings_rounded, color: Color(0xFF38BDF8), size: 24),
-                      ),
-                      const SizedBox(width: 14),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  'AayupOnes HR Admin Console',
-                                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.white),
-                                ),
-                                SizedBox(width: 6),
-                                Icon(Icons.verified_rounded, color: Color(0xFF38BDF8), size: 14),
-                              ],
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              'Employee Directory, Attendance Log & Payroll',
-                              style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.white70),
-                    ],
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 14),
 
