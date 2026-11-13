@@ -8,15 +8,16 @@ class AttendanceService {
   factory AttendanceService() => _instance;
   AttendanceService._internal();
 
-  /// Punch In with Location Coordinates
+  /// Punch In with Location Coordinates (Supports WFH & Office)
   Future<bool> punchIn({
-    required double latitude,
-    required double longitude,
-    required String locationName,
+    double? latitude,
+    double? longitude,
+    String locationName = 'Work From Home (WFH Remote)',
+    String workMode = 'Remote',
   }) async {
     try {
       final client = HttpClient();
-      client.connectionTimeout = const Duration(seconds: 3);
+      client.connectionTimeout = const Duration(seconds: 4);
 
       try {
         final request = await client.postUrl(Uri.parse(ApiEndpoints.punchIn));
@@ -25,9 +26,10 @@ class AttendanceService {
         if (token != null) request.headers.set('authorization', 'Bearer $token');
 
         request.add(utf8.encode(jsonEncode({
-          'latitude': latitude,
-          'longitude': longitude,
+          'latitude': latitude ?? 26.8467,
+          'longitude': longitude ?? 80.9462,
           'location': locationName,
+          'workMode': workMode,
           'timestamp': DateTime.now().toIso8601String(),
         })));
 

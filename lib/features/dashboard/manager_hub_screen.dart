@@ -12,100 +12,10 @@ class _ManagerHubScreenState extends State<ManagerHubScreen> with SingleTickerPr
   late TabController _tabController;
 
   // 1. Pending Approvals List
-  final List<Map<String, dynamic>> _pendingRequests = [
-    {
-      'id': 'REQ-101',
-      'name': 'Vikram Singh',
-      'role': 'Senior Backend Engineer',
-      'avatar': 'VS',
-      'category': 'Leave Request',
-      'categoryColor': const Color(0xFF6366F1),
-      'details': 'Casual Leave (CL) • 30 Oct - 02 Nov (3 Days)',
-      'reason': 'Attending sibling wedding ceremony in Varanasi',
-      'appliedOn': 'Today, 10:15 AM',
-      'icon': Icons.beach_access_rounded,
-    },
-    {
-      'id': 'REQ-102',
-      'name': 'Sneha Tiwari',
-      'role': 'UI/UX Product Designer',
-      'avatar': 'ST',
-      'category': 'Attendance Regularization',
-      'categoryColor': AppColors.warning,
-      'details': '23 Oct 2026 • Late by 25 mins (In: 10:15 AM)',
-      'reason': 'Client site meeting at Hazratganj before coming to office',
-      'appliedOn': 'Yesterday',
-      'icon': Icons.lock_reset_rounded,
-    },
-    {
-      'id': 'REQ-103',
-      'name': 'Amit Patel',
-      'role': 'QA & Automation Engineer',
-      'avatar': 'AP',
-      'category': 'Expense Claim',
-      'categoryColor': AppColors.success,
-      'details': 'Travel & Fuel • ₹ 1,850.00',
-      'reason': 'Cab fare for client server deployment at Gomti Nagar office',
-      'appliedOn': '26 Oct 2026',
-      'icon': Icons.currency_rupee_rounded,
-    },
-    {
-      'id': 'REQ-104',
-      'name': 'Pooja Verma',
-      'role': 'HR Operations',
-      'avatar': 'PV',
-      'category': 'Work From Home (WFH)',
-      'categoryColor': AppColors.primary,
-      'details': 'WFH • 29 Oct 2026 (1 Day)',
-      'reason': 'Home plumbing work and electric inspection at residence',
-      'appliedOn': '27 Oct 2026',
-      'icon': Icons.home_work_outlined,
-    },
-  ];
+  final List<Map<String, dynamic>> _pendingRequests = [];
 
   // 2. Team Attendance Members
-  final List<Map<String, dynamic>> _teamMembers = [
-    {
-      'name': 'Vikram Singh',
-      'role': 'Senior Backend Engineer',
-      'avatar': 'VS',
-      'status': 'In Office',
-      'statusColor': AppColors.success,
-      'statusBg': AppColors.successLight,
-      'inTime': '09:28 AM',
-      'hoursLogged': '05h 12m',
-    },
-    {
-      'name': 'Sneha Tiwari',
-      'role': 'UI/UX Designer',
-      'avatar': 'ST',
-      'status': 'Work From Home',
-      'statusColor': AppColors.primary,
-      'statusBg': AppColors.primaryLight,
-      'inTime': '09:40 AM',
-      'hoursLogged': '04h 45m',
-    },
-    {
-      'name': 'Amit Patel',
-      'role': 'QA Engineer',
-      'avatar': 'AP',
-      'status': 'In Office',
-      'statusColor': AppColors.success,
-      'statusBg': AppColors.successLight,
-      'inTime': '09:55 AM (Late)',
-      'hoursLogged': '04h 10m',
-    },
-    {
-      'name': 'Pooja Verma',
-      'role': 'HR Operations',
-      'avatar': 'PV',
-      'status': 'On Leave',
-      'statusColor': AppColors.danger,
-      'statusBg': AppColors.dangerLight,
-      'inTime': '--',
-      'hoursLogged': '00h 00m',
-    },
-  ];
+  final List<Map<String, dynamic>> _teamMembers = [];
 
   @override
   void initState() {

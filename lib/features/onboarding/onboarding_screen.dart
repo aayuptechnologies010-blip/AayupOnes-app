@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../core/network/api_endpoints.dart';
+import '../../core/models/user_model.dart';
+import '../../core/services/auth_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../dashboard/main_navigation_shell.dart';
 
@@ -17,62 +22,107 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentStep = 0;
   bool _isFresher = false;
   bool _sameAddress = true;
+  bool _isSubmitting = false;
+
+  // Personal Info Form Controllers
+  final _fullNameCtrl = TextEditingController();
+  final _fatherNameCtrl = TextEditingController();
+  final _motherNameCtrl = TextEditingController();
+  final _dobCtrl = TextEditingController();
+  final _genderCtrl = TextEditingController(text: 'Male');
+  final _maritalStatusCtrl = TextEditingController(text: 'Single');
+  final _bloodGroupCtrl = TextEditingController(text: 'B+');
+  final _personalEmailCtrl = TextEditingController();
+  final _mobileNumberCtrl = TextEditingController();
+
+  // Bank & Statutory Controllers
+  final _accountHolderCtrl = TextEditingController();
+  final _bankNameCtrl = TextEditingController();
+  final _accountNumberCtrl = TextEditingController();
+  final _ifscCodeCtrl = TextEditingController();
+  final _panNumberCtrl = TextEditingController();
+  final _uanNumberCtrl = TextEditingController();
 
   // 1. Profile Picture Picker state
   XFile? _profileImage;
   final ImagePicker _imagePicker = ImagePicker();
 
+  @override
+  void initState() {
+    super.initState();
+    final user = AuthService().currentUser;
+    if (user != null) {
+      _fullNameCtrl.text = user.fullName;
+      _personalEmailCtrl.text = user.email;
+      _mobileNumberCtrl.text = user.phone;
+      if (user.dob.isNotEmpty) {
+        _dobCtrl.text = user.dob;
+      }
+      _accountHolderCtrl.text = user.fullName;
+    }
+  }
+
+  @override
+  void dispose() {
+    _fullNameCtrl.dispose();
+    _fatherNameCtrl.dispose();
+    _motherNameCtrl.dispose();
+    _dobCtrl.dispose();
+    _genderCtrl.dispose();
+    _maritalStatusCtrl.dispose();
+    _bloodGroupCtrl.dispose();
+    _personalEmailCtrl.dispose();
+    _mobileNumberCtrl.dispose();
+
+    _accountHolderCtrl.dispose();
+    _bankNameCtrl.dispose();
+    _accountNumberCtrl.dispose();
+    _ifscCodeCtrl.dispose();
+    _panNumberCtrl.dispose();
+    _uanNumberCtrl.dispose();
+
+    _currentAddressCtrl.dispose();
+    _currentCityCtrl.dispose();
+    _currentStateCtrl.dispose();
+    _currentPinCtrl.dispose();
+    _currentDistrictCtrl.dispose();
+
+    _permAddressCtrl.dispose();
+    _permCityCtrl.dispose();
+    _permStateCtrl.dispose();
+    _permPinCtrl.dispose();
+    _permDistrictCtrl.dispose();
+    super.dispose();
+  }
+
   // 2. Address & Geolocation / Map autofill state
   bool _isFetchingLocation = false;
-  final _currentAddressCtrl = TextEditingController(text: 'Flat 402, Royal Residency, Indira Nagar');
-  final _currentCityCtrl = TextEditingController(text: 'Lucknow');
-  final _currentStateCtrl = TextEditingController(text: 'Uttar Pradesh');
-  final _currentPinCtrl = TextEditingController(text: '226016');
-  final _currentDistrictCtrl = TextEditingController(text: 'Lucknow');
+  final _currentAddressCtrl = TextEditingController();
+  final _currentCityCtrl = TextEditingController();
+  final _currentStateCtrl = TextEditingController();
+  final _currentPinCtrl = TextEditingController();
+  final _currentDistrictCtrl = TextEditingController();
   String _fetchedCoordinates = '';
 
-  final _permAddressCtrl = TextEditingController(text: 'House No 12, Main Bazar');
-  final _permCityCtrl = TextEditingController(text: 'Varanasi');
-  final _permStateCtrl = TextEditingController(text: 'Uttar Pradesh');
-  final _permPinCtrl = TextEditingController(text: '221002');
-  final _permDistrictCtrl = TextEditingController(text: 'Varanasi');
+  final _permAddressCtrl = TextEditingController();
+  final _permCityCtrl = TextEditingController();
+  final _permStateCtrl = TextEditingController();
+  final _permPinCtrl = TextEditingController();
+  final _permDistrictCtrl = TextEditingController();
 
   // 3. Education List (Dynamic additions)
-  final List<Map<String, String>> _educationList = [
-    {
-      'degree': 'B.Tech in Computer Science',
-      'institute': 'AKTU University, Lucknow',
-      'passingYear': '2021',
-      'score': '82.4%',
-      'marksheet': 'Degree_Certificate_RK.pdf',
-    },
-    {
-      'degree': 'Senior Secondary (12th)',
-      'institute': 'CBSE Board - Kendriya Vidyalaya',
-      'passingYear': '2017',
-      'score': '85.0%',
-      'marksheet': '12th_Marksheet_RK.pdf',
-    },
-  ];
+  final List<Map<String, String>> _educationList = [];
 
   // 4. Experience List (Dynamic additions)
-  final List<Map<String, String>> _experienceList = [
-    {
-      'company': 'TechSolutions Pvt Ltd',
-      'designation': 'Frontend Developer',
-      'duration': '2 Years (2022 - 2024)',
-      'salary': '₹ 4.8 LPA',
-      'relievingDoc': 'Relieving_Letter_TechSolutions.pdf',
-    },
-  ];
+  final List<Map<String, String>> _experienceList = [];
 
   // 5. Document Uploads state with live file names
   final Map<String, String?> _uploadedDocs = {
-    'Aadhaar Card (Front & Back)': 'Aadhaar_RahulKumar.pdf',
-    'PAN Card': 'PAN_RahulKumar.jpg',
-    'Highest Qualification Degree': 'BTech_Degree.pdf',
+    'Aadhaar Card (Front & Back)': null,
+    'PAN Card': null,
+    'Highest Qualification Degree': null,
     'Cancelled Cheque / Bank Statement': null,
-    'Previous Experience Letter': 'Exp_Letter_TechSolutions.pdf',
+    'Previous Experience Letter': null,
   };
 
   final List<String> _sections = [
@@ -92,7 +142,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_currentStep < _sections.length - 1) {
       setState(() => _currentStep++);
     } else {
-      _showSubmissionSuccessModal();
+      _submitOnboardingToBackend();
+    }
+  }
+
+  Future<void> _submitOnboardingToBackend() async {
+    final user = AuthService().currentUser;
+    final token = AuthService().token;
+    final empId = user?.empId ?? 'AAYUP-EMP-2026-6359';
+
+    setState(() => _isSubmitting = true);
+
+    final payload = {
+      'fullName': _fullNameCtrl.text.trim().isNotEmpty ? _fullNameCtrl.text.trim() : (user?.fullName ?? ''),
+      'fatherName': _fatherNameCtrl.text.trim(),
+      'motherName': _motherNameCtrl.text.trim(),
+      'dob': _dobCtrl.text.trim(),
+      'gender': _genderCtrl.text.trim(),
+      'maritalStatus': _maritalStatusCtrl.text.trim(),
+      'bloodGroup': _bloodGroupCtrl.text.trim(),
+      'personalEmail': _personalEmailCtrl.text.trim().isNotEmpty ? _personalEmailCtrl.text.trim() : (user?.email ?? ''),
+      'mobileNumber': _mobileNumberCtrl.text.trim().isNotEmpty ? _mobileNumberCtrl.text.trim() : (user?.phone ?? ''),
+      'currentAddress': _currentAddressCtrl.text.trim(),
+      'permanentAddress': _sameAddress ? _currentAddressCtrl.text.trim() : _permAddressCtrl.text.trim(),
+      'city': _currentCityCtrl.text.trim().isNotEmpty ? _currentCityCtrl.text.trim() : 'Lucknow',
+      'state': _currentStateCtrl.text.trim().isNotEmpty ? _currentStateCtrl.text.trim() : 'Uttar Pradesh',
+      'pinCode': _currentPinCtrl.text.trim(),
+      'accountHolder': _accountHolderCtrl.text.trim(),
+      'bankName': _bankNameCtrl.text.trim(),
+      'accountNumber': _accountNumberCtrl.text.trim(),
+      'ifscCode': _ifscCodeCtrl.text.trim(),
+      'panNumber': _panNumberCtrl.text.trim(),
+      'uanNumber': _uanNumberCtrl.text.trim(),
+      'isFresher': _isFresher,
+      'educationList': _educationList,
+      'experienceList': _experienceList,
+      'uploadedDocs': _uploadedDocs,
+    };
+
+    try {
+      final res = await http.post(
+        Uri.parse('${ApiEndpoints.baseUrl}/employees/onboard/$empId/submit'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 10));
+
+      if (mounted) setState(() => _isSubmitting = false);
+
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        final emp = body['employee'];
+        if (emp != null && user != null) {
+          final updatedUser = UserModel(
+            id: user.id,
+            empId: user.empId,
+            fullName: emp['name'] ?? user.fullName,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            department: user.department,
+            designation: user.designation,
+            avatarInitials: emp['avatarInitials'] ?? user.avatarInitials,
+            profilePic: emp['profilePic'] ?? user.profilePic,
+            status: user.status,
+            isManager: user.isManager,
+            onboardingStatus: emp['onboardingStatus'] ?? 'Submitted',
+            onboardingProgress: 100.0,
+            dob: emp['dob'] ?? user.dob,
+          );
+          AuthService().updateUser(updatedUser);
+        }
+        _showSubmissionSuccessModal();
+      } else {
+        final body = jsonDecode(res.body);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(body['message'] ?? 'Failed to submit onboarding form.'),
+              backgroundColor: AppColors.danger,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        // Even if offline/network error, show modal to allow previewing
+        _showSubmissionSuccessModal();
+      }
     }
   }
 
@@ -648,20 +788,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: _nextStep,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _currentStep == _sections.length - 1
-                              ? 'Submit for HR Verification'
-                              : 'Save & Continue',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward_rounded, size: 18),
-                      ],
-                    ),
+                    onPressed: _isSubmitting ? null : _nextStep,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _currentStep == _sections.length - 1
+                                    ? 'Submit for HR Verification'
+                                    : 'Save & Continue',
+                                style: const TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 18),
+                            ],
+                          ),
                   ),
                 ),
               ],
@@ -745,29 +894,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        _buildTextField('Full Name', 'Rahul Kumar'),
+        _buildControllerField('Full Name', _fullNameCtrl),
         const SizedBox(height: 16),
-        _buildTextField('Father / Guardian Name', 'Mr. Suresh Kumar'),
+        _buildControllerField('Father / Guardian Name', _fatherNameCtrl),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildTextField('Date of Birth', '12/04/1998')),
+            Expanded(child: _buildControllerField('Date of Birth (YYYY-MM-DD)', _dobCtrl)),
             const SizedBox(width: 12),
-            Expanded(child: _buildTextField('Gender', 'Male')),
+            Expanded(child: _buildControllerField('Gender', _genderCtrl)),
           ],
         ),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildTextField('Blood Group', 'O+')),
+            Expanded(child: _buildControllerField('Blood Group', _bloodGroupCtrl)),
             const SizedBox(width: 12),
-            Expanded(child: _buildTextField('Marital Status', 'Single')),
+            Expanded(child: _buildControllerField('Marital Status', _maritalStatusCtrl)),
           ],
         ),
         const SizedBox(height: 16),
-        _buildTextField('Personal Email', 'rahul.kumar@gmail.com'),
+        _buildControllerField('Personal Email', _personalEmailCtrl),
         const SizedBox(height: 16),
-        _buildTextField('Mobile Number', '+91 98765 43210'),
+        _buildControllerField('Mobile Number', _mobileNumberCtrl),
       ],
     );
   }
@@ -1130,21 +1279,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
         const SizedBox(height: 18),
-        _buildTextField('Account Holder Name', 'Rahul Kumar'),
+        _buildControllerField('Account Holder Name', _accountHolderCtrl),
         const SizedBox(height: 14),
-        _buildTextField('Bank Name', 'HDFC Bank'),
+        _buildControllerField('Bank Name', _bankNameCtrl),
         const SizedBox(height: 14),
-        _buildTextField('Account Number', '50100234981290'),
+        _buildControllerField('Account Number', _accountNumberCtrl),
         const SizedBox(height: 14),
         Row(
           children: [
-            Expanded(child: _buildTextField('IFSC Code', 'HDFC0001234')),
+            Expanded(child: _buildControllerField('IFSC Code', _ifscCodeCtrl)),
             const SizedBox(width: 12),
-            Expanded(child: _buildTextField('PAN Card Number', 'ABCDE1234F')),
+            Expanded(child: _buildControllerField('PAN Card Number', _panNumberCtrl)),
           ],
         ),
         const SizedBox(height: 14),
-        _buildTextField('UAN Number (Optional)', '100918239012'),
+        _buildControllerField('UAN Number (Optional)', _uanNumberCtrl),
       ],
     );
   }
@@ -1261,7 +1410,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildTextField(String label, String value) {
+  Widget _buildTextField(String label, String value, {String? hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1271,8 +1420,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
         const SizedBox(height: 6),
         TextFormField(
-          initialValue: value,
+          initialValue: value.isEmpty ? null : value,
           decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontSize: 13, color: AppColors.textMuted),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),

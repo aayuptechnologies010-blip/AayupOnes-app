@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../core/theme/app_colors.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/network/api_endpoints.dart';
 
 class OrgDirectoryScreen extends StatefulWidget {
   const OrgDirectoryScreen({super.key});
@@ -11,63 +15,82 @@ class OrgDirectoryScreen extends StatefulWidget {
 class _OrgDirectoryScreenState extends State<OrgDirectoryScreen> {
   String _selectedDept = 'All';
   final _searchCtrl = TextEditingController();
+  bool _isLoading = true;
+  List<Map<String, String>> _employees = [];
 
-  final List<Map<String, String>> _employees = [
-    {
-      'name': 'Aayush Shrivastava',
-      'role': 'Founder & CEO',
-      'dept': 'Management',
-      'email': 'aayush@aayup.com',
-      'phone': '+91 98765 43210',
-      'initials': 'AS',
-      'color': '0xFF0066D6',
-    },
-    {
-      'name': 'Pooja Verma',
-      'role': 'HR & Operations Lead',
-      'dept': 'Human Resources',
-      'email': 'hr@aayup.com',
-      'phone': '+91 98765 12345',
-      'initials': 'PV',
-      'color': '0xFF10B981',
-    },
-    {
-      'name': 'Rahul Kumar',
-      'role': 'React & Mobile Developer',
-      'dept': 'Development',
-      'email': 'rahul.k@aayup.com',
-      'phone': '+91 91234 56780',
-      'initials': 'RK',
-      'color': '0xFF4F46E5',
-    },
-    {
-      'name': 'Vikram Singh',
-      'role': 'Senior Backend Engineer',
-      'dept': 'Development',
-      'email': 'vikram.s@aayup.com',
-      'phone': '+91 98321 65498',
-      'initials': 'VS',
-      'color': '0xFF0EA5E9',
-    },
-    {
-      'name': 'Sneha Tiwari',
-      'role': 'UI/UX Product Designer',
-      'dept': 'Design',
-      'email': 'sneha.t@aayup.com',
-      'phone': '+91 95432 10987',
-      'initials': 'ST',
-      'color': '0xFFF59E0B',
-    },
-    {
-      'name': 'Amit Patel',
-      'role': 'QA & Automation Engineer',
-      'dept': 'Quality Assurance',
-      'email': 'amit.p@aayup.com',
-      'phone': '+91 97890 23456',
-      'initials': 'AP',
-      'color': '0xFFEC4899',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchDirectory();
+  }
+
+  Future<void> _fetchDirectory() async {
+    setState(() => _isLoading = true);
+    final token = AuthService().token;
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiEndpoints.baseUrl}/employees'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 6));
+
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        if (body['success'] == true && body['employees'] is List) {
+          final list = (body['employees'] as List).map<Map<String, String>>((e) {
+            final name = e['name']?.toString() ?? 'Team Member';
+            final role = e['role']?.toString() ?? 'Engineer';
+            final dept = e['dept']?.toString() ?? 'Engineering';
+            final email = e['email']?.toString() ?? '';
+            final phone = e['phone']?.toString() ?? '';
+            final avatar = e['avatar']?.toString() ?? name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
+            return {
+              'name': name,
+              'role': role,
+              'dept': dept,
+              'email': email,
+              'phone': phone,
+              'initials': avatar,
+              'color': '0xFF0066D6',
+            };
+          }).toList();
+
+          if (mounted) {
+            setState(() {
+              _employees = list;
+              _isLoading = false;
+            });
+            return;
+          }
+        }
+      }
+    } catch (_) {}
+
+    // Fallback to active current user
+    if (mounted) {
+      final currentUser = AuthService().currentUser;
+      setState(() {
+        if (currentUser != null) {
+          _employees = [
+            {
+              'name': currentUser.fullName,
+              'role': currentUser.designation,
+              'dept': currentUser.department,
+              'email': currentUser.email,
+              'phone': currentUser.phone,
+              'initials': currentUser.avatarInitials,
+              'color': '0xFF0066D6',
+            }
+          ];
+        } else {
+          _employees = [];
+        }
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,14 +172,16 @@ class _OrgDirectoryScreenState extends State<OrgDirectoryScreen> {
 
           // Employee List
           Expanded(
-            child: filtered.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No team members found',
-                      style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-                    ),
-                  )
-                : ListView.separated(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                : filtered.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No team members found',
+                          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                        ),
+                      )
+                    : ListView.separated(
                     padding: const EdgeInsets.all(20),
                     itemCount: filtered.length,
                     separatorBuilder: (context, index) => const SizedBox(height: 12),

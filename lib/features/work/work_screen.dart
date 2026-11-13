@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../core/theme/app_colors.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/network/api_endpoints.dart';
 import 'log_work_screen.dart';
 
 class WorkManagementScreen extends StatefulWidget {
@@ -13,11 +17,49 @@ class WorkManagementScreen extends StatefulWidget {
 
 class _WorkManagementScreenState extends State<WorkManagementScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isLoading = true;
+  List<dynamic> _todayTasks = [];
+  List<dynamic> _upcomingTasks = [];
+  List<dynamic> _completedTasks = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _fetchTasks();
+  }
+
+  Future<void> _fetchTasks() async {
+    setState(() => _isLoading = true);
+    final token = AuthService().token;
+    try {
+      final res = await http.get(
+        Uri.parse(ApiEndpoints.tasks),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 6));
+
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        if (body['success'] == true && body['data'] != null) {
+          if (mounted) {
+            setState(() {
+              _todayTasks = body['data']['today'] ?? [];
+              _upcomingTasks = body['data']['upcoming'] ?? [];
+              _completedTasks = body['data']['completed'] ?? [];
+              _isLoading = false;
+            });
+            return;
+          }
+        }
+      }
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -49,21 +91,23 @@ class _WorkManagementScreenState extends State<WorkManagementScreen> with Single
           indicatorColor: AppColors.primary,
           indicatorWeight: 3,
           labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-          tabs: const [
-            Tab(text: "Today's Work (2)"),
-            Tab(text: 'Upcoming (4)'),
-            Tab(text: 'Completed (12)'),
+          tabs: [
+            Tab(text: "Today's Work (${_todayTasks.length})"),
+            Tab(text: "Upcoming (${_upcomingTasks.length})"),
+            Tab(text: "Completed (${_completedTasks.length})"),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildTodayTasksList(),
-          _buildUpcomingTasksList(),
-          _buildCompletedTasksList(),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _buildTaskList(_todayTasks, isToday: true),
+                _buildTaskList(_upcomingTasks),
+                _buildTaskList(_completedTasks, isCompleted: true),
+              ],
+            ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -81,102 +125,91 @@ class _WorkManagementScreenState extends State<WorkManagementScreen> with Single
     );
   }
 
-  Widget _buildTodayTasksList() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.primaryLight,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.tips_and_updates_outlined, color: AppColors.primary, size: 22),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Submit your daily progress update before 06:30 PM for manager review.',
-                  style: TextStyle(color: AppColors.primaryDark, fontSize: 12, fontWeight: FontWeight.w600),
+  Widget _buildTaskList(List<dynamic> tasks, {bool isToday = false, bool isCompleted = false}) {
+    if (tasks.isEmpty) {
+      return RefreshIndicator(
+        color: AppColors.primary,
+        backgroundColor: Colors.white,
+        onRefresh: _fetchTasks,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Container(
+            height: 400,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.task_alt_rounded, size: 48, color: AppColors.textMuted),
+                const SizedBox(height: 12),
+                Text(
+                  isCompleted ? 'No completed tasks yet' : (isToday ? 'No tasks pending for today' : 'No upcoming tasks scheduled'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 16),
+      );
+    }
 
-        _buildTaskCard(
-          project: 'Solar CRM Development',
-          module: 'Lead Management System',
-          title: 'Implement Excel Lead Bulk Upload Parser API',
-          description: 'Build backend multipart upload endpoint in Node.js with field validation and duplicate check logic.',
-          priority: 'High Priority',
-          priorityColor: AppColors.danger,
-          deadline: 'Due Today • 05:00 PM',
-          progress: 0.80,
-          assignedBy: 'Mr. Arvind Sharma (Tech Lead)',
-        ),
-        const SizedBox(height: 14),
+    return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: Colors.white,
+      onRefresh: _fetchTasks,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        children: [
+        if (isToday)
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.tips_and_updates_outlined, color: AppColors.primary, size: 22),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Submit your daily progress update before 06:30 PM for manager review.',
+                    style: TextStyle(color: AppColors.primaryDark, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ...tasks.map((t) {
+          final priority = t['priority']?.toString() ?? 'Medium';
+          final pColor = priority.contains('High')
+              ? AppColors.danger
+              : (priority.contains('Medium') ? AppColors.warning : AppColors.success);
 
-        _buildTaskCard(
-          project: 'AayupOnes Mobile App',
-          module: 'Attendance Module',
-          title: 'Integrate Geofencing & Biometric Clock Out Screen',
-          description: 'Design interactive calendar dots and wire up GPS radius check with office polygon bounds.',
-          priority: 'Medium Priority',
-          priorityColor: AppColors.warning,
-          deadline: 'Due Today • 06:15 PM',
-          progress: 0.50,
-          assignedBy: 'Mr. Arvind Sharma (Tech Lead)',
-        ),
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: _buildTaskCard(
+              project: t['project']?.toString() ?? 'AayupOnes HRMS',
+              title: t['title']?.toString() ?? 'Assigned Task',
+              description: t['description']?.toString() ?? '',
+              priority: priority,
+              priorityColor: pColor,
+              deadline: t['deadline']?.toString() ?? 'Due Today',
+              progress: (t['progress'] is num) ? (t['progress'] as num).toDouble() : 0.0,
+              assignedBy: t['assignedBy']?.toString() ?? 'Aayup Admin',
+              isDone: isCompleted,
+            ),
+          );
+        }),
       ],
-    );
-  }
-
-  Widget _buildUpcomingTasksList() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        _buildTaskCard(
-          project: 'Solar CRM Development',
-          module: 'Reports & Analytics',
-          title: 'Lead Conversion Funnel Chart Integration',
-          description: 'Visualize weekly lead sources and salesperson conversion metrics via clean SVG chart widgets.',
-          priority: 'Medium Priority',
-          priorityColor: AppColors.warning,
-          deadline: 'Starts 29 Oct 2026',
-          progress: 0.0,
-          assignedBy: 'Mr. Arvind Sharma (Tech Lead)',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompletedTasksList() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        _buildTaskCard(
-          project: 'AayupOnes Mobile App',
-          module: 'Auth & Onboarding',
-          title: 'Employee First-Login & 6-Step Onboarding Form',
-          description: 'Completed onboarding wizard flow with personal details, bank KYC, and document upload.',
-          priority: 'High Priority',
-          priorityColor: AppColors.success,
-          deadline: 'Completed Yesterday',
-          progress: 1.0,
-          assignedBy: 'Aayup HR System',
-          isDone: true,
-        ),
-      ],
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildTaskCard({
     required String project,
-    required String module,
     required String title,
     required String description,
     required String priority,
@@ -225,8 +258,10 @@ class _WorkManagementScreenState extends State<WorkManagementScreen> with Single
           ),
           const SizedBox(height: 12),
           Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-          const SizedBox(height: 6),
-          Text(description, style: const TextStyle(fontSize: 12, height: 1.4, color: AppColors.textSecondary)),
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(description, style: const TextStyle(fontSize: 12, height: 1.4, color: AppColors.textSecondary)),
+          ],
           const SizedBox(height: 14),
 
           Row(

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "509073626381",
+    "project_id": "aayupones-e45b3",
+    "storage_bucket": "aayupones-e45b3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509073626381:android:e3bf7cf9621673af2a0c44",
+        "android_client_info": {
+          "package_name": "com.aayuptechnologies.aayupones"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOxbQTDndEKSOiPr_S510b530dKL6nbHU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+

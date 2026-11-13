@@ -4,18 +4,16 @@ import '../../core/theme/app_colors.dart';
 class LogWorkScreen extends StatefulWidget {
   final String taskName;
 
-  const LogWorkScreen({super.key, this.taskName = 'Solar CRM Module'});
+  const LogWorkScreen({super.key, this.taskName = 'Daily Operational Task'});
 
   @override
   State<LogWorkScreen> createState() => _LogWorkScreenState();
 }
 
 class _LogWorkScreenState extends State<LogWorkScreen> {
-  final _hoursCtrl = TextEditingController(text: '4.5');
-  final _descCtrl = TextEditingController(
-    text: 'Finished the multipart API controller, added validation for phone/email headers, and created test seeds.',
-  );
-  double _progress = 0.80;
+  final _hoursCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  double _progress = 0.50;
   bool _isLoading = false;
 
   void _handleSubmit() {

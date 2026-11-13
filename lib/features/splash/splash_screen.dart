@@ -50,15 +50,35 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
+    // Check for saved user session & Auto-Login
+    Future.microtask(() async {
+      await AuthService().tryAutoLogin();
+    });
+
     // Navigate to Dashboard if session exists, else Login after branding delay
-    Future.delayed(const Duration(milliseconds: 2400), () {
+    Future.delayed(const Duration(milliseconds: 2000), () async {
       if (mounted) {
         final isLoggedIn = AuthService().isAuthenticated;
+        
+        // If logged in, double check shift isn't already closed
+        if (isLoggedIn) {
+          // If shift completed in background or outside hours, log out gracefully
+          final shiftEnd = '06:30 PM';
+          final now = DateTime.now();
+          final nowMin = now.hour * 60 + now.minute;
+          // 06:30 PM = 18:30 = 1110 minutes; 09:30 AM = 570 minutes
+          if (nowMin >= 1110 || nowMin < 570) {
+            await AuthService().logout();
+          }
+        }
+
+        final stillLoggedIn = AuthService().isAuthenticated;
+
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, anim1, anim2) =>
-                isLoggedIn ? const MainNavigationShell() : const LoginScreen(),
+                stillLoggedIn ? const MainNavigationShell() : const LoginScreen(),
             transitionsBuilder: (context, anim1, anim2, child) {
               return FadeTransition(opacity: anim1, child: child);
             },
@@ -119,9 +139,12 @@ class _SplashScreenState extends State<SplashScreen>
 
           // Central Logo & Branding Content
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: FadeTransition(
@@ -219,6 +242,7 @@ class _SplashScreenState extends State<SplashScreen>
               ],
             ),
           ),
+        ),
 
           // Bottom Company Tagline & Loader
           Positioned(

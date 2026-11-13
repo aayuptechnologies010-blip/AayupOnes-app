@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../network/api_endpoints.dart';
 
@@ -23,82 +24,103 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
+  static const String _tokenKey = 'aayup_auth_token';
+  static const String _userKey = 'aayup_user_data';
+
   UserModel? _currentUser;
   String? _authToken;
 
   UserModel? get currentUser => _currentUser;
   String? get token => _authToken;
-  bool get isAuthenticated => _authToken != null;
+  bool get isAuthenticated => _authToken != null && _authToken!.isNotEmpty;
 
-  /// Perform corporate login with admin-issued ID & Password
+  /// Initialize and restore session from local SharedPreferences
+  Future<bool> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedToken = prefs.getString(_tokenKey);
+      final savedUserJson = prefs.getString(_userKey);
+
+      if (savedToken != null && savedToken.isNotEmpty && savedUserJson != null) {
+        _authToken = savedToken;
+        _currentUser = UserModel.fromJson(jsonDecode(savedUserJson));
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Perform corporate login with admin-issued ID/Email & Password
   Future<ApiResponse<UserModel>> login({
     required String empId,
     required String password,
   }) async {
     try {
-      // 1. Try Live HTTP Backend Call (Standard HttpClient built into dart:io)
-      final client = HttpClient();
-      client.connectionTimeout = const Duration(seconds: 4);
+      final response = await http
+          .post(
+            Uri.parse(ApiEndpoints.login),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'empId': empId.trim(),
+              'email': empId.trim(),
+              'password': password.trim(),
+            }),
+          )
+          .timeout(const Duration(seconds: 10));
 
-      try {
-        final request = await client.postUrl(Uri.parse(ApiEndpoints.login));
-        request.headers.set('content-type', 'application/json');
-        request.add(utf8.encode(jsonEncode({
-          'empId': empId,
-          'password': password,
-        })));
+      final jsonMap = jsonDecode(response.body) as Map<String, dynamic>;
 
-        final response = await request.close();
-        if (response.statusCode == 200) {
-          final reply = await response.transform(utf8.decoder).join();
-          final jsonMap = jsonDecode(reply) as Map<String, dynamic>;
-          final user = UserModel.fromJson(jsonMap['user'] as Map<String, dynamic>);
-          _currentUser = user;
-          _authToken = jsonMap['token'] as String? ?? 'mock_token_jwt';
-          return ApiResponse(success: true, message: 'Logged in successfully', data: user);
-        }
-      } catch (_) {
-        // Fallback to active mock session if server is offline during dev
-      } finally {
-        client.close();
+      if (response.statusCode == 200 && jsonMap['success'] == true) {
+        final user = UserModel.fromJson(jsonMap['user'] as Map<String, dynamic>);
+        _currentUser = user;
+        _authToken = jsonMap['token'] as String?;
+
+        // Persist session to local storage
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          if (_authToken != null) {
+            await prefs.setString(_tokenKey, _authToken!);
+          }
+          await prefs.setString(_userKey, jsonEncode(user.toJson()));
+        } catch (_) {}
+
+        return ApiResponse(
+          success: true,
+          message: jsonMap['message'] as String? ?? 'Logged in successfully',
+          data: user,
+          statusCode: response.statusCode,
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: jsonMap['message'] as String? ?? 'Invalid Employee ID/Email or Password.',
+          statusCode: response.statusCode,
+        );
       }
-
-      // 2. High-Fidelity Local Session (Offline / Dev Fallback)
-      await Future.delayed(const Duration(milliseconds: 600));
-
-      final fallbackUser = UserModel(
-        id: 'emp_0024',
-        empId: empId.isNotEmpty ? empId : 'AAYUP-DEV-0024',
-        fullName: 'Rahul Kumar',
-        email: 'rahul.k@aayup.com',
-        phone: '+91 91234 56780',
-        role: 'React Developer',
-        department: 'Development',
-        designation: 'Software Engineer L2',
-        avatarInitials: 'RK',
-        status: 'Active',
-        isManager: true,
-      );
-
-      _currentUser = fallbackUser;
-      _authToken = 'jwt_token_aayup_corp_2026';
-
-      return ApiResponse(
-        success: true,
-        message: 'Signed in successfully via Corporate Directory',
-        data: fallbackUser,
-      );
     } catch (e) {
       return ApiResponse(
         success: false,
-        message: 'Authentication failed: $e',
+        message: 'Could not connect to backend server: $e',
         statusCode: 500,
       );
     }
   }
 
-  void logout() {
+  Future<void> updateUser(UserModel updatedUser) async {
+    _currentUser = updatedUser;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userKey, jsonEncode(updatedUser.toJson()));
+    } catch (_) {}
+  }
+
+  Future<void> logout() async {
     _currentUser = null;
     _authToken = null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_userKey);
+    } catch (_) {}
   }
 }

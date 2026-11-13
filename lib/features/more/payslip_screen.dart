@@ -57,11 +57,19 @@ class _PayslipScreenState extends State<PayslipScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        backgroundColor: Colors.white,
+        onRefresh: () async {
+          setState(() {});
+          await Future.delayed(const Duration(milliseconds: 400));
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             // Month Selector Dropdown Card
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -293,7 +301,8 @@ class _PayslipScreenState extends State<PayslipScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildSummaryMetric(String label, String value) {

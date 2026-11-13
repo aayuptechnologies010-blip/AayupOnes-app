@@ -1,15 +1,21 @@
 class UserModel {
   final String id;
   final String empId;
+  String get employeeId => empId;
   final String fullName;
+  String get name => fullName;
   final String email;
   final String phone;
   final String role;
   final String department;
   final String designation;
   final String avatarInitials;
+  final String profilePic;
   final String status;
   final bool isManager;
+  final String onboardingStatus;
+  final double onboardingProgress;
+  final String dob;
 
   UserModel({
     required this.id,
@@ -21,23 +27,33 @@ class UserModel {
     required this.department,
     required this.designation,
     required this.avatarInitials,
+    this.profilePic = '',
     required this.status,
     this.isManager = true,
+    this.onboardingStatus = 'Not Started',
+    this.onboardingProgress = 0.0,
+    this.dob = '',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String? ?? 'emp_0024',
-      empId: json['empId'] as String? ?? 'AAYUP-DEV-0024',
-      fullName: json['fullName'] as String? ?? 'Rahul Kumar',
-      email: json['email'] as String? ?? 'rahul.k@aayup.com',
-      phone: json['phone'] as String? ?? '+91 91234 56780',
-      role: json['role'] as String? ?? 'React Developer',
-      department: json['department'] as String? ?? 'Development',
-      designation: json['designation'] as String? ?? 'Software Engineer L2',
-      avatarInitials: json['avatarInitials'] as String? ?? 'RK',
-      status: json['status'] as String? ?? 'Active',
-      isManager: json['isManager'] as bool? ?? true,
+      id: (json['id'] ?? json['_id'])?.toString() ?? '',
+      empId: (json['empId'] ?? json['employeeId'])?.toString() ?? '',
+      fullName: (json['fullName'] ?? json['name'])?.toString() ?? 'Team Member',
+      email: json['email']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'Employee',
+      department: json['department']?.toString() ?? 'Operations',
+      designation: json['designation']?.toString() ?? 'Team Member',
+      avatarInitials: json['avatarInitials']?.toString() ?? 'EM',
+      profilePic: json['profilePic']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'ACTIVE',
+      isManager: json['isManager'] as bool? ?? (json['role'] == 'manager' || json['role'] == 'admin' || json['role'] == 'hr'),
+      onboardingStatus: json['onboardingStatus']?.toString() ?? 'Not Started',
+      onboardingProgress: (json['onboardingProgress'] is num)
+          ? (json['onboardingProgress'] as num).toDouble()
+          : 0.0,
+      dob: json['dob']?.toString() ?? '',
     );
   }
 
@@ -52,8 +68,12 @@ class UserModel {
       'department': department,
       'designation': designation,
       'avatarInitials': avatarInitials,
+      'profilePic': profilePic,
       'status': status,
       'isManager': isManager,
+      'onboardingStatus': onboardingStatus,
+      'onboardingProgress': onboardingProgress,
+      'dob': dob,
     };
   }
 }

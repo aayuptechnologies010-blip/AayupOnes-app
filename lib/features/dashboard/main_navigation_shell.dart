@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/services/shift_timer_manager.dart';
 import 'home_screen.dart';
 import '../attendance/attendance_screen.dart';
 import '../work/work_screen.dart';
@@ -15,6 +16,19 @@ class MainNavigationShell extends StatefulWidget {
 
 class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start background shift enforcement timer on dashboard load
+    ShiftTimerManager().startShiftMonitoring();
+  }
+
+  @override
+  void dispose() {
+    ShiftTimerManager().stopShiftMonitoring();
+    super.dispose();
+  }
 
   void _switchTab(int index) {
     setState(() => _currentIndex = index);

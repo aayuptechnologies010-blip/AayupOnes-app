@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/services/auth_service.dart';
 import '../auth/login_screen.dart';
 import '../documents/employee_documents_screen.dart';
 import '../leave/leave_screen.dart';
@@ -47,13 +48,16 @@ class _MoreScreenState extends State<MoreScreen> {
               backgroundColor: AppColors.danger,
               foregroundColor: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(dialogCtx);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false,
-              );
+              await AuthService().logout();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
             child: const Text('Logout', style: TextStyle(fontWeight: FontWeight.w700)),
           ),
@@ -134,7 +138,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Headquarters:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                      Text('Bengaluru & Noida, India', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                      Text('Lucknow HQ, India', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                     ],
                   ),
                   SizedBox(height: 6),
@@ -347,10 +351,18 @@ class _MoreScreenState extends State<MoreScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: Colors.white,
+          onRefresh: () async {
+            setState(() {});
+            await Future.delayed(const Duration(milliseconds: 400));
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // Standard AayupOnes Brand Gradient Header (Matching App Theme)
               Container(
                 width: double.infinity,
@@ -451,12 +463,15 @@ class _MoreScreenState extends State<MoreScreen> {
                                       child: const Icon(Icons.calendar_month_rounded, size: 20, color: AppColors.primary),
                                     ),
                                     const SizedBox(width: 10),
-                                    const Column(
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Joining Date', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                        SizedBox(height: 2),
-                                        Text('02/11/2026', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.textPrimary)),
+                                        const Text('Joining Date', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '05/11/2026',
+                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.textPrimary),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -475,14 +490,14 @@ class _MoreScreenState extends State<MoreScreen> {
                                       child: const Icon(Icons.badge_rounded, size: 20, color: AppColors.warning),
                                     ),
                                     const SizedBox(width: 10),
-                                    const Column(
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Employee ID', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                        SizedBox(height: 2),
+                                        const Text('Employee ID', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                                        const SizedBox(height: 2),
                                         Text(
-                                          'AAYUP-EMP-2026-37583',
-                                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.primary),
+                                          AuthService().currentUser?.empId ?? 'AAYUP-EMP-2026-6359',
+                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppColors.primary),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
@@ -793,7 +808,8 @@ class _MoreScreenState extends State<MoreScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildGridTile({

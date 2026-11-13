@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/fcm_notification_service.dart';
 import '../dashboard/main_navigation_shell.dart';
+import '../onboarding/onboarding_screen.dart';
+import 'face_verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,8 +14,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
-  final _empIdController = TextEditingController(text: 'AAYUP-DEV-0024');
-  final _passwordController = TextEditingController(text: 'temp@1234');
+  final _empIdController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _rememberMe = true;
@@ -84,31 +87,69 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     setState(() => _isLoading = false);
 
     if (response.success) {
+      // Direct user to Face Selfie Verification step before entering workspace
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 350),
-          pageBuilder: (context, anim, secAnim) => const MainNavigationShell(),
+          pageBuilder: (context, anim, secAnim) => FaceVerificationScreen(
+            loginResponseData: {
+              'token': AuthService().token,
+              'user': AuthService().currentUser,
+            },
+          ),
           transitionsBuilder: (context, anim, secAnim, child) {
             return FadeTransition(opacity: anim, child: child);
           },
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          content: Row(
-            children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.white),
-              const SizedBox(width: 10),
-              Expanded(child: Text(response.message)),
+      // Check if rejection was due to closed shift
+      final isShiftClosed = response.statusCode == 403 && response.message.toLowerCase().contains('shift');
+      if (isShiftClosed) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: const Row(
+              children: [
+                Icon(Icons.schedule_rounded, color: Color(0xFFD97706)),
+                SizedBox(width: 8),
+                Text('Shift Hours Closed', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ],
+            ),
+            content: Text(
+              response.message,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF475569), height: 1.4),
+            ),
+            actions: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
-          backgroundColor: AppColors.danger,
-        ),
-      );
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            content: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(child: Text(response.message)),
+              ],
+            ),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
     }
   }
 
