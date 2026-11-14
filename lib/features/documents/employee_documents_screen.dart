@@ -168,8 +168,8 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
-                  icon: Icon(allowDownload ? Icons.download_rounded : Icons.check_circle_rounded),
-                  label: Text(allowDownload ? 'Download Document' : 'Verified Document'),
+                  icon: const Icon(Icons.download_rounded),
+                  label: const Text('Download Document PDF'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -178,7 +178,17 @@ class _EmployeeDocumentsScreenState extends State<EmployeeDocumentsScreen> with 
                   onPressed: () {
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(allowDownload ? 'Downloading $fileName...' : 'Document is verified for official records.')),
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: AppColors.success,
+                        content: Row(
+                          children: [
+                            const Icon(Icons.file_download_done_rounded, color: Colors.white),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text('Downloaded $fileName to device storage.')),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 ),

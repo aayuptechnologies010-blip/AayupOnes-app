@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +25,8 @@ class FaceVerificationScreen extends StatefulWidget {
 
 class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   final ImagePicker _picker = ImagePicker();
-  File? _capturedImage;
+  XFile? _capturedFile;
+  Uint8List? _capturedImageBytes;
   bool _isCapturing = false;
   bool _isVerifying = false;
   String? _errorMessage;
@@ -54,8 +56,10 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       );
 
       if (photo != null) {
+        final bytes = await photo.readAsBytes();
         setState(() {
-          _capturedImage = File(photo.path);
+          _capturedFile = photo;
+          _capturedImageBytes = bytes;
           _isCapturing = false;
         });
         await _verifyFaceWithServer();
@@ -73,7 +77,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   }
 
   Future<void> _verifyFaceWithServer() async {
-    if (_capturedImage == null) return;
+    if (_capturedImageBytes == null) return;
 
     setState(() {
       _isVerifying = true;
@@ -81,8 +85,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     });
 
     try {
-      final bytes = await _capturedImage!.readAsBytes();
-      final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+      final base64Image = 'data:image/jpeg;base64,${base64Encode(_capturedImageBytes!)}';
       final token = widget.loginResponseData['token'] as String?;
 
       final response = await http.post(
@@ -215,7 +218,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                       color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(130),
                       border: Border.all(
-                        color: _capturedImage != null ? const Color(0xFF10B981) : AppColors.primary,
+                        color: _capturedImageBytes != null ? const Color(0xFF10B981) : AppColors.primary,
                         width: 3,
                       ),
                       boxShadow: [
@@ -227,11 +230,11 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                       ],
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: _capturedImage != null
+                    child: _capturedImageBytes != null
                         ? Stack(
                             fit: StackFit.expand,
                             children: [
-                              Image.file(_capturedImage!, fit: BoxFit.cover),
+                              Image.memory(_capturedImageBytes!, fit: BoxFit.cover),
                               if (_isVerifying)
                                 Container(
                                   color: Colors.black.withOpacity(0.4),
@@ -305,7 +308,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                       onPressed: (_isCapturing || _isVerifying) ? null : _takeSelfie,
                       icon: const Icon(Icons.camera_alt_rounded),
                       label: Text(
-                        _capturedImage == null ? 'Capture Selfie' : 'Retake Selfie',
+                        _capturedImageBytes == null ? 'Capture Selfie' : 'Retake Selfie',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),

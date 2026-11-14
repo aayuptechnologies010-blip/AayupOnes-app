@@ -236,8 +236,15 @@ class _PayslipScreenState extends State<PayslipScreen> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('$_selectedMonth Payslip PDF downloaded successfully!'),
+                      behavior: SnackBarBehavior.floating,
                       backgroundColor: AppColors.success,
+                      content: Row(
+                        children: [
+                          const Icon(Icons.file_download_done_rounded, color: Colors.white),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text('$_selectedMonth Payslip PDF downloaded to your device storage!')),
+                        ],
+                      ),
                     ),
                   );
                 },
