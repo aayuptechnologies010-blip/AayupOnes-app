@@ -1,18 +1,16 @@
 import 'package:flutter/foundation.dart';
 
 class ApiEndpoints {
-  // Primary backend server IP for Physical Android Devices, Emulators & Web
+  // Live Cloud Backend (Render)
+  static const String liveServerUrl = 'https://aayupones-backend.onrender.com/api';
+
+  // Fallback Local IP for offline development
   static const String serverIp = '192.168.29.234';
   static const String serverPort = '8080';
 
   // Configurable base URL:
-  // - Web / Desktop uses localhost:8080
-  // - Physical Device & Android Emulator connects to host Wi-Fi IP: 192.168.29.234:8080
-  static const String _defaultUrl = kDebugMode
-      ? (kIsWeb
-          ? 'http://localhost:$serverPort/api'
-          : 'http://$serverIp:$serverPort/api')
-      : 'http://$serverIp:$serverPort/api';
+  // Points directly to the live cloud backend by default for App, Emulators and Physical Devices
+  static const String _defaultUrl = liveServerUrl;
 
   static const String baseUrl = String.fromEnvironment('API_URL', defaultValue: _defaultUrl);
 
